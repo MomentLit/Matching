@@ -1,3 +1,17 @@
 spring:
   application:
     name: Matchings
+
+  datasource:
+    url: "jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5434}/${DB_NAME:momentlit_matchings}"
+    username: "${DB_USERNAME:matchings_user}"
+    password: "${DB_PASSWORD:matchings_password}"
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: "${JPA_DDL_AUTO:update}"
+    show-sql: true
+
+jwt:
+  secret: "${JWT_SECRET:momentlit-matchings-service-jwt-secret-key-for-local-test-1234567890}"
