@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface MatchingRepository extends JpaRepository<Matching, Long> {
 
-    List<Matching> findBySellerIdOrderByCreatedAtDesc(String sellerId);
+    List<Matching> findByRequesterIdOrderByCreatedAtDesc(String requesterId);
 }

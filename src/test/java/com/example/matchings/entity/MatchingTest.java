@@ -9,13 +9,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MatchingTest {
 
-    private static final String SELLER_ID = "seller-1";
+    private static final String REQUESTER_ID = "requester-1";
+    private static final String SPACE_OWNER_ID = "space-owner-1";
 
     @Test
     void approveChangesRequestedMatchingToApproved() {
         Matching matching = createMatching();
 
-        matching.approve(SELLER_ID);
+        matching.approve(SPACE_OWNER_ID);
 
         assertThat(matching.getStatus()).isEqualTo(MatchingStatus.APPROVED);
     }
@@ -24,24 +25,42 @@ class MatchingTest {
     void rejectChangesRequestedMatchingToRejected() {
         Matching matching = createMatching();
 
-        matching.reject(SELLER_ID);
+        matching.reject(SPACE_OWNER_ID);
 
         assertThat(matching.getStatus()).isEqualTo(MatchingStatus.REJECTED);
     }
 
     @Test
+    void approveThrowsWhenRequesterTriesToApproveOwnMatching() {
+        Matching matching = createMatching();
+
+        assertThatThrownBy(() -> matching.approve(REQUESTER_ID))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("매칭 처리 권한 없음");
+    }
+
+    @Test
+    void rejectThrowsWhenRequesterTriesToRejectOwnMatching() {
+        Matching matching = createMatching();
+
+        assertThatThrownBy(() -> matching.reject(REQUESTER_ID))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("매칭 처리 권한 없음");
+    }
+
+    @Test
     void approveThrowsWhenMatchingIsNotRequested() {
         Matching approvedMatching = createMatching();
-        approvedMatching.approve(SELLER_ID);
+        approvedMatching.approve(SPACE_OWNER_ID);
 
-        assertThatThrownBy(() -> approvedMatching.approve(SELLER_ID))
+        assertThatThrownBy(() -> approvedMatching.approve(SPACE_OWNER_ID))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("요청 상태의 매칭만 처리 가능");
 
         Matching rejectedMatching = createMatching();
-        rejectedMatching.reject(SELLER_ID);
+        rejectedMatching.reject(SPACE_OWNER_ID);
 
-        assertThatThrownBy(() -> rejectedMatching.approve(SELLER_ID))
+        assertThatThrownBy(() -> rejectedMatching.approve(SPACE_OWNER_ID))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("요청 상태의 매칭만 처리 가능");
     }
@@ -49,16 +68,16 @@ class MatchingTest {
     @Test
     void rejectThrowsWhenMatchingIsNotRequested() {
         Matching approvedMatching = createMatching();
-        approvedMatching.approve(SELLER_ID);
+        approvedMatching.approve(SPACE_OWNER_ID);
 
-        assertThatThrownBy(() -> approvedMatching.reject(SELLER_ID))
+        assertThatThrownBy(() -> approvedMatching.reject(SPACE_OWNER_ID))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("요청 상태의 매칭만 처리 가능");
 
         Matching rejectedMatching = createMatching();
-        rejectedMatching.reject(SELLER_ID);
+        rejectedMatching.reject(SPACE_OWNER_ID);
 
-        assertThatThrownBy(() -> rejectedMatching.reject(SELLER_ID))
+        assertThatThrownBy(() -> rejectedMatching.reject(SPACE_OWNER_ID))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("요청 상태의 매칭만 처리 가능");
     }
@@ -66,7 +85,10 @@ class MatchingTest {
     private Matching createMatching() {
         return Matching.create(
                 1L,
-                SELLER_ID,
+                REQUESTER_ID,
                 LocalDateTime.of(2026, 6, 10, 10, 0),
                 LocalDateTime.of(2026, 6, 10, 11, 0),
                 10000
+        );
+    }
+}

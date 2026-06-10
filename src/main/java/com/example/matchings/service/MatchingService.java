@@ -46,12 +46,12 @@ public class MatchingService {
 
     @Transactional(readOnly = true)
     public MatchingListResponse getReceivedMatchings(String userId) {
-        return toListResponse(matchingRepository.findBySellerIdOrderByCreatedAtDesc(userId));
+        return toListResponse(List.of());
     }
 
     @Transactional(readOnly = true)
     public MatchingListResponse getSentMatchings(String userId) {
-        return toListResponse(matchingRepository.findBySellerIdOrderByCreatedAtDesc(userId));
+        return toListResponse(matchingRepository.findByRequesterIdOrderByCreatedAtDesc(userId));
     }
 
     @Transactional

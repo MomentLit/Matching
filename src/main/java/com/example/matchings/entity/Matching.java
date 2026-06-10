@@ -22,8 +22,8 @@ public class Matching {
     @Column(nullable = false, name = "space_id")
     private Long spaceId;
 
-    @Column(nullable = false, name = "seller_id")
-    private String sellerId;
+    @Column(nullable = false, name = "requester_id")
+    private String requesterId;
 
     @Column(nullable = false, name = "start_time")
     private LocalDateTime startTime;
@@ -48,14 +48,14 @@ public class Matching {
 
     public static Matching create(
             Long spaceId,
-            String sellerId,
+            String requesterId,
             LocalDateTime startTime,
             LocalDateTime endTime,
             Integer totalPrice
     ) {
         return Matching.builder()
                 .spaceId(spaceId)
-                .sellerId(sellerId)
+                .requesterId(requesterId)
                 .startTime(startTime)
                 .endTime(endTime)
                 .totalPrice(totalPrice)
@@ -64,19 +64,19 @@ public class Matching {
     }
 
     public void approve(String userId) {
-        validateSeller(userId);
+        validateNotRequester(userId);
         validateRequested();
         this.status = MatchingStatus.APPROVED;
     }
 
     public void reject(String userId) {
-        validateSeller(userId);
+        validateNotRequester(userId);
         validateRequested();
         this.status = MatchingStatus.REJECTED;
     }
 
-    private void validateSeller(String userId) {
-        if (!sellerId.equals(userId)) {
+    private void validateNotRequester(String userId) {
+        if (requesterId.equals(userId)) {
             throw new IllegalStateException("매칭 처리 권한 없음");
         }
     }
