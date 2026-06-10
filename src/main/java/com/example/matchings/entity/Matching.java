@@ -65,17 +65,25 @@ public class Matching {
 
     public void approve(String userId) {
         validateSeller(userId);
+        validateRequested();
         this.status = MatchingStatus.APPROVED;
     }
 
     public void reject(String userId) {
         validateSeller(userId);
+        validateRequested();
         this.status = MatchingStatus.REJECTED;
     }
 
     private void validateSeller(String userId) {
         if (!sellerId.equals(userId)) {
             throw new IllegalStateException("매칭 처리 권한 없음");
+        }
+    }
+
+    private void validateRequested() {
+        if (status != MatchingStatus.REQUESTED) {
+            throw new IllegalStateException("요청 상태의 매칭만 처리 가능");
         }
     }
 }
