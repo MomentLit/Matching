@@ -4,6 +4,7 @@ import com.example.matchings.entity.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -37,8 +38,12 @@ public class JwtProvider {
                 .parseSignedClaims(token)
                 .getPayload();
 
-        String role = claims.get("role", String.class)
-                .replace("ROLE_", "");
+        String roleClaim = claims.get("role", String.class);
+        if (roleClaim == null || roleClaim.isBlank()) {
+            throw new MalformedJwtException("role claim is required");
+        }
+
+        String role = roleClaim.replace("ROLE_", "");
 
         return Role.valueOf(role);
     }
