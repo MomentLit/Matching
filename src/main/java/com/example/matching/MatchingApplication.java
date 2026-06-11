@@ -1,13 +1,13 @@
-package com.example.matchings;
+package com.example.matching;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MatchingsApplication {
+public class MatchingApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MatchingsApplication.class, args);
+        SpringApplication.run(MatchingApplication.class, args);
     }
 
 }

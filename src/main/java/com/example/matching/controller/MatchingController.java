@@ -1,12 +1,12 @@
-package com.example.matchings.controller;
+package com.example.matching.controller;
 
-import com.example.matchings.dto.request.MatchingCreateRequest;
-import com.example.matchings.dto.response.MatchingCreateResponse;
-import com.example.matchings.dto.response.MatchingListResponse;
-import com.example.matchings.global.dto.ApiResponse;
-import com.example.matchings.global.security.UserPrincipal;
-import com.example.matchings.global.util.ResponseUtil;
-import com.example.matchings.service.MatchingService;
+import com.example.matching.dto.request.MatchingCreateRequest;
+import com.example.matching.dto.response.MatchingCreateResponse;
+import com.example.matching.dto.response.MatchingListResponse;
+import com.example.matching.global.dto.ApiResponse;
+import com.example.matching.global.security.UserPrincipal;
+import com.example.matching.global.util.ResponseUtil;
+import com.example.matching.service.MatchingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

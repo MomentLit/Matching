@@ -1,6 +1,6 @@
-package com.example.matchings.global.util;
+package com.example.matching.global.util;
 
-import com.example.matchings.global.dto.ApiResponse;
+import com.example.matching.global.dto.ApiResponse;
 
 public class ResponseUtil {
 

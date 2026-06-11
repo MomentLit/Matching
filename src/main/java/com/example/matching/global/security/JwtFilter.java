@@ -1,6 +1,6 @@
-package com.example.matchings.global.security;
+package com.example.matching.global.security;
 
-import com.example.matchings.entity.Role;
+import com.example.matching.entity.Role;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

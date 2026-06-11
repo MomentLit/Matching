@@ -1,11 +1,11 @@
-package com.example.matchings.service;
+package com.example.matching.service;
 
-import com.example.matchings.dto.request.MatchingCreateRequest;
-import com.example.matchings.dto.response.MatchingCreateResponse;
-import com.example.matchings.dto.response.MatchingListResponse;
-import com.example.matchings.dto.response.MatchingSearchResponse;
-import com.example.matchings.entity.Matching;
-import com.example.matchings.repository.MatchingRepository;
+import com.example.matching.dto.request.MatchingCreateRequest;
+import com.example.matching.dto.response.MatchingCreateResponse;
+import com.example.matching.dto.response.MatchingListResponse;
+import com.example.matching.dto.response.MatchingSearchResponse;
+import com.example.matching.entity.Matching;
+import com.example.matching.repository.MatchingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
