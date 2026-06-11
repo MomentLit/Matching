@@ -1,4 +1,4 @@
-package com.example.matchings.dto.request;
+package com.example.matching.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;

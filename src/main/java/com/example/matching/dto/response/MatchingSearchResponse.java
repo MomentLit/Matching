@@ -1,7 +1,7 @@
-package com.example.matchings.dto.response;
+package com.example.matching.dto.response;
 
-import com.example.matchings.entity.Matching;
-import com.example.matchings.entity.MatchingStatus;
+import com.example.matching.entity.Matching;
+import com.example.matching.entity.MatchingStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;

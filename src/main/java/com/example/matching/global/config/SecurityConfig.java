@@ -1,6 +1,6 @@
-package com.example.matchings.global.config;
+package com.example.matching.global.config;
 
-import com.example.matchings.global.security.JwtFilter;
+import com.example.matching.global.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

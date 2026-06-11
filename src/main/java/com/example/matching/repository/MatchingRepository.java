@@ -1,6 +1,6 @@
-package com.example.matchings.repository;
+package com.example.matching.repository;
 
-import com.example.matchings.entity.Matching;
+import com.example.matching.entity.Matching;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

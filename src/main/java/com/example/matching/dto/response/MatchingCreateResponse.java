@@ -1,6 +1,6 @@
-package com.example.matchings.dto.response;
+package com.example.matching.dto.response;
 
-import com.example.matchings.entity.Matching;
+import com.example.matching.entity.Matching;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record MatchingCreateResponse(

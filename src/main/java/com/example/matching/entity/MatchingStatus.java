@@ -1,4 +1,4 @@
-package com.example.matchings.entity;
+package com.example.matching.entity;
 
 public enum MatchingStatus {
     REQUESTED,
