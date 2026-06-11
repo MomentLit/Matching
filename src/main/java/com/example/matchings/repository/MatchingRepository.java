@@ -1,0 +1,13 @@
+package com.example.matchings.repository;
+
+import com.example.matchings.entity.Matching;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface MatchingRepository extends JpaRepository<Matching, Long> {
+
+    List<Matching> findByRequesterIdOrderByCreatedAtDesc(String requesterId);
+}
