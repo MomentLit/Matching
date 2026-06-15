@@ -70,4 +70,14 @@ public class MatchingController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{matching-id}/cancel")
+    public ResponseEntity<Void> cancel(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable("matching-id") Long matchingId
+    ) {
+        matchingService.cancel(principal.getUserId(), matchingId);
+
+        return ResponseEntity.noContent().build();
+    }
 }

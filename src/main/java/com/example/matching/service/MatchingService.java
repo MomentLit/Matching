@@ -1,10 +1,13 @@
 package com.example.matching.service;
 
+import com.example.matching.client.SpaceClient;
+import com.example.matching.client.dto.SpaceMatchingContextResponse;
 import com.example.matching.dto.request.MatchingCreateRequest;
 import com.example.matching.dto.response.MatchingCreateResponse;
 import com.example.matching.dto.response.MatchingListResponse;
 import com.example.matching.dto.response.MatchingSearchResponse;
 import com.example.matching.entity.Matching;
+import com.example.matching.entity.MatchingStatus;
 import com.example.matching.repository.MatchingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,12 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class MatchingService {
 
     private final MatchingRepository matchingRepository;
+    private final SpaceClient spaceClient;
 
     @Transactional
     public MatchingCreateResponse create(String userId, MatchingCreateRequest request) {
@@ -31,9 +36,15 @@ public class MatchingService {
 
         Integer totalPrice = parsePrice(request.totalPrice());
 
+        SpaceMatchingContextResponse space =
+                spaceClient.getMatchingContext(request.spaceId(), startTime, endTime);
+
+        validateSpaceForMatching(userId, space);
+
         Matching matching = Matching.create(
                 request.spaceId(),
                 userId,
+                space.hostId(),
                 startTime,
                 endTime,
                 totalPrice
@@ -46,17 +57,36 @@ public class MatchingService {
 
     @Transactional(readOnly = true)
     public MatchingListResponse getReceivedMatchings(String userId) {
-        return toListResponse(List.of());
+        return toListResponse(matchingRepository.findByHostIdOrderByCreatedAtDesc(userId));
     }
 
     @Transactional(readOnly = true)
     public MatchingListResponse getSentMatchings(String userId) {
-        return toListResponse(matchingRepository.findByRequesterIdOrderByCreatedAtDesc(userId));
+        return toListResponse(matchingRepository.findBySellerIdOrderByCreatedAtDesc(userId));
     }
 
     @Transactional
     public void approve(String userId, Long matchingId) {
         Matching matching = getMatching(matchingId);
+        if (!matching.isHost(userId)) {
+            throw new SecurityException("매칭 처리 권한이 없습니다.");
+        }
+
+        SpaceMatchingContextResponse space = spaceClient.getMatchingContext(
+                matching.getSpaceId(),
+                matching.getStartTime(),
+                matching.getEndTime()
+        );
+
+        validateSpaceForMatching(matching.getSellerId(), space);
+        if (!matching.getHostId().equals(space.hostId())) {
+            throw new IllegalStateException("공간 소유자가 변경되어 매칭을 승인할 수 없습니다.");
+        }
+
+        List<Matching> spaceMatchings =
+                matchingRepository.findAllBySpaceIdForUpdate(matching.getSpaceId());
+
+        validateNoApprovedOverlap(matching, spaceMatchings);
         matching.approve(userId);
     }
 
@@ -64,6 +94,12 @@ public class MatchingService {
     public void reject(String userId, Long matchingId) {
         Matching matching = getMatching(matchingId);
         matching.reject(userId);
+    }
+
+    @Transactional
+    public void cancel(String userId, Long matchingId) {
+        Matching matching = getMatching(matchingId);
+        matching.cancel(userId);
     }
 
     private MatchingListResponse toListResponse(List<Matching> matchings) {
@@ -77,6 +113,48 @@ public class MatchingService {
     private Matching getMatching(Long matchingId) {
         return matchingRepository.findById(matchingId)
                 .orElseThrow(() -> new IllegalArgumentException("매칭 없음"));
+    }
+
+    private void validateSpaceForMatching(
+            String sellerId,
+            SpaceMatchingContextResponse space
+    ) {
+        if (!space.active()) {
+            throw new IllegalStateException("비활성 공간에는 매칭을 요청할 수 없습니다.");
+        }
+
+        if (!space.approved()) {
+            throw new IllegalStateException("승인되지 않은 공간에는 매칭을 요청할 수 없습니다.");
+        }
+
+        if (!space.available()) {
+            throw new IllegalStateException("요청 시간이 공간의 예약 가능 일정에 포함되지 않습니다.");
+        }
+
+        if (sellerId.equals(space.hostId())) {
+            throw new IllegalStateException("본인 공간에는 매칭을 요청할 수 없습니다.");
+        }
+    }
+
+    private void validateNoApprovedOverlap(
+            Matching target,
+            List<Matching> spaceMatchings
+    ) {
+        boolean overlaps = spaceMatchings.stream()
+                .filter(matching ->
+                        matching != target
+                                && (target.getId() == null
+                                || !Objects.equals(matching.getId(), target.getId()))
+                )
+                .filter(matching -> matching.getStatus() == MatchingStatus.APPROVED)
+                .anyMatch(matching ->
+                        matching.getStartTime().isBefore(target.getEndTime())
+                                && matching.getEndTime().isAfter(target.getStartTime())
+                );
+
+        if (overlaps) {
+            throw new IllegalStateException("이미 승인된 매칭과 시간이 겹칩니다.");
+        }
     }
 
     private LocalDateTime parseTime(String value) {
