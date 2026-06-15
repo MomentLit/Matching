@@ -13,7 +13,7 @@ paths:
     post:
       tags: ["Matchings"]
       summary: "Create a matching request"
-      description: "Creates a matching request for the authenticated requester. /matchings/** requires authentication."
+      description: "Creates a matching request for the authenticated seller after validating the space owner, approval, active state, and schedule availability through Space Service."
       security:
         - bearerAuth: []
       requestBody:
@@ -35,7 +35,7 @@ paths:
     get:
       tags: ["Matchings"]
       summary: "Get received matchings"
-      description: "Currently returns an empty list from service code. Intended received matching policy is Needs confirmation."
+      description: "Returns matchings received by the authenticated host, ordered by created_at descending."
       security:
         - bearerAuth: []
       responses:
@@ -51,7 +51,7 @@ paths:
     get:
       tags: ["Matchings"]
       summary: "Get sent matchings"
-      description: "Returns matchings created by the authenticated requester, ordered by created_at descending."
+      description: "Returns matchings created by the authenticated seller, ordered by created_at descending."
       security:
         - bearerAuth: []
       responses:
@@ -101,6 +101,25 @@ paths:
           description: "Matching rejected."
         default:
           description: "Needs confirmation"
+  /matchings/{matching-id}/cancel:
+    patch:
+      tags: ["Matchings"]
+      summary: "Cancel a matching"
+      description: "Cancels a REQUESTED matching. Only the seller that created the matching can cancel it."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: matching-id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: "Matching canceled."
+        default:
+          description: "Needs confirmation"
 components:
   schemas:
     ApiResponse:
@@ -148,6 +167,10 @@ components:
         space_id:
           type: integer
           format: int64
+        seller_id:
+          type: string
+        host_id:
+          type: string
         start_time:
           type: string
           format: date-time

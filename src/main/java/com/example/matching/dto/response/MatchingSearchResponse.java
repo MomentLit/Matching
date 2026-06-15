@@ -13,6 +13,12 @@ public record MatchingSearchResponse(
         @JsonProperty("space_id")
         Long spaceId,
 
+        @JsonProperty("seller_id")
+        String sellerId,
+
+        @JsonProperty("host_id")
+        String hostId,
+
         @JsonProperty("start_time")
         LocalDateTime startTime,
 
@@ -32,6 +38,8 @@ public record MatchingSearchResponse(
         return new MatchingSearchResponse(
                 matching.getId(),
                 matching.getSpaceId(),
+                matching.getSellerId(),
+                matching.getHostId(),
                 matching.getStartTime(),
                 matching.getEndTime(),
                 matching.getTotalPrice(),

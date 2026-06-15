@@ -7,9 +7,14 @@
 - end_time must be after start_time.
 - total_price must parse as an integer and must not be negative.
 - New matchings start with REQUESTED status.
-- Requester cannot approve or reject their own matching.
-- Only REQUESTED matchings can be approved or rejected.
-- Received matchings currently return an empty list from service code.
+- Matching creation resolves the host through Space Service.
+- Only active, approved spaces with a schedule covering the requested time can receive matching requests.
+- Sellers cannot request their own spaces.
+- Only the stored host can approve or reject a matching.
+- Only the stored seller can cancel a matching.
+- Only REQUESTED matchings can be approved, rejected, or canceled.
+- Received matchings are queried by hostId.
+- Approval locks matching rows for the space and blocks overlap with an existing APPROVED matching.
 
 ## Validation Rules
 
@@ -46,7 +51,4 @@ The service throws IllegalArgumentException and IllegalStateException directly. 
 
 ## Needs Confirmation
 
-- Received matching lookup currently returns an empty list; intended owner/host lookup policy is Needs confirmation.
-- How a matching maps to a space host is not visible.
-- Cancellation behavior is not exposed even though CANCELED exists.
 - HTTP error response format is not visible.

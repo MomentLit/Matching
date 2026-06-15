@@ -6,7 +6,7 @@ Matching
 
 ## Service Responsibility
 
-Matching creation, sent matching lookup, received matching placeholder lookup, and approve/reject state changes.
+Matching creation, sent/received lookup, host approval/rejection, and seller cancellation.
 
 ## Technology Stack
 
@@ -27,11 +27,11 @@ Matching creation, sent matching lookup, received matching placeholder lookup, a
 
 ## Main Domains
 
-Matching entity with MatchingStatus enum. Matching requests reference spaceId and requesterId by value.
+Matching entity with MatchingStatus enum. Matching requests store spaceId, sellerId, and hostId by value.
 
 ## Main Features
 
-Matching creation, sent matching lookup, received matching placeholder lookup, and approve/reject state changes.
+Matching creation, sent/received lookup, host approval/rejection, seller cancellation, and overlap prevention.
 
 ## Main APIs
 
@@ -39,7 +39,7 @@ Visible APIs under /matchings. Full details are in API_SPEC.yaml.
 
 ## Data Access Structure
 
-MatchingRepository extends JpaRepository<Matching, Long> and can find sent matchings by requesterId ordered by createdAt descending.
+MatchingRepository extends JpaRepository<Matching, Long> and supports seller/host lookup plus space-level pessimistic locking for approval.
 
 ## Exception Handling
 
@@ -47,7 +47,7 @@ The service throws IllegalArgumentException and IllegalStateException directly. 
 
 ## Test Structure
 
-Context load, Matching entity tests, and JwtProvider tests are visible. Some test packages use com.example.matchings while main code uses com.example.matching.
+Matching entity, service policy, JWT parsing, and application context tests are present under com.example.matching.
 
 ## API Documentation
 
@@ -64,7 +64,4 @@ When API behavior changes, `API_SPEC.yaml` must be updated in the same PR.
 
 ## Needs Confirmation
 
-- Received matching lookup currently returns an empty list; intended owner/host lookup policy is Needs confirmation.
-- How a matching maps to a space host is not visible.
-- Cancellation behavior is not exposed even though CANCELED exists.
 - HTTP error response format is not visible.

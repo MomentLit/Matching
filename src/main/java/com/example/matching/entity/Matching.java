@@ -22,8 +22,11 @@ public class Matching {
     @Column(nullable = false, name = "space_id")
     private Long spaceId;
 
-    @Column(nullable = false, name = "requester_id")
-    private String requesterId;
+    @Column(nullable = false, name = "seller_id")
+    private String sellerId;
+
+    @Column(nullable = false, name = "host_id")
+    private String hostId;
 
     @Column(nullable = false, name = "start_time")
     private LocalDateTime startTime;
@@ -48,14 +51,16 @@ public class Matching {
 
     public static Matching create(
             Long spaceId,
-            String requesterId,
+            String sellerId,
+            String hostId,
             LocalDateTime startTime,
             LocalDateTime endTime,
             Integer totalPrice
     ) {
         return Matching.builder()
                 .spaceId(spaceId)
-                .requesterId(requesterId)
+                .sellerId(sellerId)
+                .hostId(hostId)
                 .startTime(startTime)
                 .endTime(endTime)
                 .totalPrice(totalPrice)
@@ -64,20 +69,36 @@ public class Matching {
     }
 
     public void approve(String userId) {
-        validateNotRequester(userId);
+        validateHost(userId);
         validateRequested();
         this.status = MatchingStatus.APPROVED;
     }
 
     public void reject(String userId) {
-        validateNotRequester(userId);
+        validateHost(userId);
         validateRequested();
         this.status = MatchingStatus.REJECTED;
     }
 
-    private void validateNotRequester(String userId) {
-        if (requesterId.equals(userId)) {
-            throw new IllegalStateException("매칭 처리 권한 없음");
+    public void cancel(String userId) {
+        validateSeller(userId);
+        validateRequested();
+        this.status = MatchingStatus.CANCELED;
+    }
+
+    public boolean isHost(String userId) {
+        return hostId.equals(userId);
+    }
+
+    private void validateHost(String userId) {
+        if (!isHost(userId)) {
+            throw new SecurityException("매칭 처리 권한이 없습니다.");
+        }
+    }
+
+    private void validateSeller(String userId) {
+        if (!sellerId.equals(userId)) {
+            throw new SecurityException("매칭 취소 권한이 없습니다.");
         }
     }
 
