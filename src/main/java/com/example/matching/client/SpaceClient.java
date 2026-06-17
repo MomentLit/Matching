@@ -13,10 +13,11 @@ public class SpaceClient {
     private final RestClient restClient;
 
     public SpaceClient(
-            RestClient.Builder restClientBuilder,
             @Value("${space-service.base-url}") String baseUrl
     ) {
-        this.restClient = restClientBuilder.baseUrl(baseUrl).build();
+        this.restClient = RestClient.builder()
+                .baseUrl(baseUrl)
+                .build();
     }
 
     public SpaceMatchingContextResponse getMatchingContext(
