@@ -8,6 +8,10 @@ import com.example.matching.dto.response.MatchingListResponse;
 import com.example.matching.dto.response.MatchingSearchResponse;
 import com.example.matching.entity.Matching;
 import com.example.matching.entity.MatchingStatus;
+import com.example.matching.global.exception.BadRequestException;
+import com.example.matching.global.exception.ForbiddenException;
+import com.example.matching.global.exception.InvalidMatchingStateException;
+import com.example.matching.global.exception.MatchingNotFoundException;
 import com.example.matching.repository.MatchingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +35,7 @@ public class MatchingService {
         LocalDateTime endTime = parseTime(request.endTime());
 
         if (!endTime.isAfter(startTime)) {
-            throw new IllegalArgumentException("종료 시간은 시작 시간 이후여야 함");
+            throw new BadRequestException("종료 시간은 시작 시간 이후여야 함");
         }
 
         Integer totalPrice = parsePrice(request.totalPrice());
@@ -69,7 +73,7 @@ public class MatchingService {
     public void approve(String userId, Long matchingId) {
         Matching matching = getMatching(matchingId);
         if (!matching.isHost(userId)) {
-            throw new SecurityException("매칭 처리 권한이 없습니다.");
+            throw new ForbiddenException("매칭 처리 권한이 없습니다.");
         }
 
         SpaceMatchingContextResponse space = spaceClient.getMatchingContext(
@@ -80,7 +84,7 @@ public class MatchingService {
 
         validateSpaceForMatching(matching.getSellerId(), space);
         if (!matching.getHostId().equals(space.hostId())) {
-            throw new IllegalStateException("공간 소유자가 변경되어 매칭을 승인할 수 없습니다.");
+            throw new InvalidMatchingStateException("공간 소유자가 변경되어 매칭을 승인할 수 없습니다.");
         }
 
         List<Matching> spaceMatchings =
@@ -112,7 +116,7 @@ public class MatchingService {
 
     private Matching getMatching(Long matchingId) {
         return matchingRepository.findById(matchingId)
-                .orElseThrow(() -> new IllegalArgumentException("매칭 없음"));
+                .orElseThrow(() -> new MatchingNotFoundException("매칭 없음"));
     }
 
     private void validateSpaceForMatching(
@@ -120,19 +124,19 @@ public class MatchingService {
             SpaceMatchingContextResponse space
     ) {
         if (!space.active()) {
-            throw new IllegalStateException("비활성 공간에는 매칭을 요청할 수 없습니다.");
+            throw new InvalidMatchingStateException("비활성 공간에는 매칭을 요청할 수 없습니다.");
         }
 
         if (!space.approved()) {
-            throw new IllegalStateException("승인되지 않은 공간에는 매칭을 요청할 수 없습니다.");
+            throw new InvalidMatchingStateException("승인되지 않은 공간에는 매칭을 요청할 수 없습니다.");
         }
 
         if (!space.available()) {
-            throw new IllegalStateException("요청 시간이 공간의 예약 가능 일정에 포함되지 않습니다.");
+            throw new InvalidMatchingStateException("요청 시간이 공간의 예약 가능 일정에 포함되지 않습니다.");
         }
 
         if (sellerId.equals(space.hostId())) {
-            throw new IllegalStateException("본인 공간에는 매칭을 요청할 수 없습니다.");
+            throw new InvalidMatchingStateException("본인 공간에는 매칭을 요청할 수 없습니다.");
         }
     }
 
@@ -153,7 +157,7 @@ public class MatchingService {
                 );
 
         if (overlaps) {
-            throw new IllegalStateException("이미 승인된 매칭과 시간이 겹칩니다.");
+            throw new InvalidMatchingStateException("이미 승인된 매칭과 시간이 겹칩니다.");
         }
     }
 
@@ -164,7 +168,7 @@ public class MatchingService {
             try {
                 return LocalDateTime.parse(value);
             } catch (Exception ignored) {
-                throw new IllegalArgumentException("시간 형식이 올바르지 않음");
+                throw new BadRequestException("시간 형식이 올바르지 않음");
             }
         }
     }
@@ -173,11 +177,11 @@ public class MatchingService {
         try {
             Integer totalPrice = Integer.valueOf(value);
             if (totalPrice < 0) {
-                throw new IllegalArgumentException("총 금액은 음수일 수 없음");
+                throw new BadRequestException("총 금액은 음수일 수 없음");
             }
             return totalPrice;
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("총 금액 형식이 올바르지 않음");
+            throw new BadRequestException("총 금액 형식이 올바르지 않음");
         }
     }
 }
