@@ -5,6 +5,7 @@ import com.example.matching.client.dto.SpaceMatchingContextResponse;
 import com.example.matching.dto.request.MatchingCreateRequest;
 import com.example.matching.entity.Matching;
 import com.example.matching.entity.MatchingStatus;
+import com.example.matching.global.exception.InvalidMatchingStateException;
 import com.example.matching.repository.MatchingRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,7 @@ class MatchingServiceTest {
                 .thenReturn(new SpaceMatchingContextResponse(1L, "seller-1", true, true, true));
 
         assertThatThrownBy(() -> matchingService.create("seller-1", createRequest()))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(InvalidMatchingStateException.class)
                 .hasMessage("본인 공간에는 매칭을 요청할 수 없습니다.");
 
         verify(matchingRepository, never()).save(any());
@@ -96,7 +97,7 @@ class MatchingServiceTest {
                 .thenReturn(List.of(target, approved));
 
         assertThatThrownBy(() -> matchingService.approve("host-1", 1L))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(InvalidMatchingStateException.class)
                 .hasMessage("이미 승인된 매칭과 시간이 겹칩니다.");
         assertThat(target.getStatus()).isEqualTo(MatchingStatus.REQUESTED);
     }

@@ -1,5 +1,7 @@
 package com.example.matching.entity;
 
+import com.example.matching.global.exception.ForbiddenException;
+import com.example.matching.global.exception.InvalidMatchingStateException;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -92,19 +94,19 @@ public class Matching {
 
     private void validateHost(String userId) {
         if (!isHost(userId)) {
-            throw new SecurityException("매칭 처리 권한이 없습니다.");
+            throw new ForbiddenException("매칭 처리 권한이 없습니다.");
         }
     }
 
     private void validateSeller(String userId) {
         if (!sellerId.equals(userId)) {
-            throw new SecurityException("매칭 취소 권한이 없습니다.");
+            throw new ForbiddenException("매칭 취소 권한이 없습니다.");
         }
     }
 
     private void validateRequested() {
         if (status != MatchingStatus.REQUESTED) {
-            throw new IllegalStateException("요청 상태의 매칭만 처리 가능");
+            throw new InvalidMatchingStateException("요청 상태의 매칭만 처리 가능");
         }
     }
 }

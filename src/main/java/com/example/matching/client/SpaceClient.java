@@ -1,6 +1,7 @@
 package com.example.matching.client;
 
 import com.example.matching.client.dto.SpaceMatchingContextResponse;
+import com.example.matching.global.exception.SpaceClientException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -35,7 +36,7 @@ public class SpaceClient {
                 .body(SpaceMatchingContextResponse.class);
 
         if (response == null) {
-            throw new IllegalStateException("공간 정보를 조회할 수 없습니다.");
+            throw new SpaceClientException("공간 정보를 조회할 수 없습니다.");
         }
 
         return response;

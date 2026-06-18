@@ -1,5 +1,7 @@
 package com.example.matching.entity;
 
+import com.example.matching.global.exception.ForbiddenException;
+import com.example.matching.global.exception.InvalidMatchingStateException;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -44,11 +46,11 @@ class MatchingTest {
         Matching matching = createMatching();
 
         assertThatThrownBy(() -> matching.approve("other-user"))
-                .isInstanceOf(SecurityException.class)
+                .isInstanceOf(ForbiddenException.class)
                 .hasMessage("매칭 처리 권한이 없습니다.");
 
         assertThatThrownBy(() -> matching.reject("other-user"))
-                .isInstanceOf(SecurityException.class)
+                .isInstanceOf(ForbiddenException.class)
                 .hasMessage("매칭 처리 권한이 없습니다.");
     }
 
@@ -57,7 +59,7 @@ class MatchingTest {
         Matching matching = createMatching();
 
         assertThatThrownBy(() -> matching.cancel(HOST_ID))
-                .isInstanceOf(SecurityException.class)
+                .isInstanceOf(ForbiddenException.class)
                 .hasMessage("매칭 취소 권한이 없습니다.");
     }
 
@@ -67,7 +69,7 @@ class MatchingTest {
         matching.approve(HOST_ID);
 
         assertThatThrownBy(() -> matching.reject(HOST_ID))
-                .isInstanceOf(IllegalStateException.class)
+                .isInstanceOf(InvalidMatchingStateException.class)
                 .hasMessage("요청 상태의 매칭만 처리 가능");
     }
 
