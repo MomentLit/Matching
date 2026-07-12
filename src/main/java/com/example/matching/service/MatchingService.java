@@ -3,6 +3,7 @@ package com.example.matching.service;
 import com.example.matching.client.SpaceClient;
 import com.example.matching.client.dto.SpaceMatchingContextResponse;
 import com.example.matching.dto.request.MatchingCreateRequest;
+import com.example.matching.dto.response.InternalMatchingResponse;
 import com.example.matching.dto.response.MatchingCreateResponse;
 import com.example.matching.dto.response.MatchingListResponse;
 import com.example.matching.dto.response.MatchingSearchResponse;
@@ -67,6 +68,11 @@ public class MatchingService {
     @Transactional(readOnly = true)
     public MatchingListResponse getSentMatchings(String userId) {
         return toListResponse(matchingRepository.findBySellerIdOrderByCreatedAtDesc(userId));
+    }
+
+    @Transactional(readOnly = true)
+    public InternalMatchingResponse getMatchingForInternal(Long matchingId) {
+        return InternalMatchingResponse.from(getMatching(matchingId));
     }
 
     @Transactional

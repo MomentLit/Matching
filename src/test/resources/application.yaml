@@ -12,3 +12,6 @@ spring:
 
 jwt:
   secret: momentlit-matchings-service-jwt-secret-key-for-local-test-1234567890
+
+space-service:
+  base-url: http://localhost:8082
