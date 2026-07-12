@@ -7,7 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 
 public record InternalMatchingResponse(
-        Long id,
+        @JsonProperty("matching_id")
+        Long matchingId,
 
         @JsonProperty("space_id")
         Long spaceId,
